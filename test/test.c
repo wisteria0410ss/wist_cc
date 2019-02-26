@@ -2,6 +2,9 @@
 #include <stdlib.h>
 //extern int main(int argc, char **argv);
 
+void compile(char *code);
+void test_ret(char *code, int expect);
+
 void compile(char *code){
     int ret;
     char cmdline[256];
@@ -15,7 +18,7 @@ void compile(char *code){
     system("gcc tmp/test.s -o tmp/test");
 }
 
-int test_ret(char *code, int expect){
+void test_ret(char *code, int expect){
     compile(code);
 
     int ret;
@@ -23,23 +26,18 @@ int test_ret(char *code, int expect){
 
     if(ret == expect){
         printf("[o] %s\n\t=> %d\n", code, ret);
-        return 0;
     }else{
         printf("[x] %s\n\t=> %d, expected %d\n", code, ret, expect);
         exit(1);
-        return 1;
     }
+
+    return;
 }
 
-void test_run(){
+void main(){
     test_ret("0", 0);
     test_ret("42", 42);
     test_ret("123", 123);
 
     exit(0);
-}
-
-int main(){
-    test_run();
-    return 0;
 }
