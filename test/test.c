@@ -37,10 +37,13 @@ void main(){
     test_ret("0", 0);
     test_ret("42", 42);
     test_ret("123", 123);
-    test_ret("1+3", 4);
-    test_ret("5+20-4", 21);
-    test_ret("12 + 34 - 5", 41);
-    test_ret("3 -  10+\t9", 2);
+    test_ret("1+3", 1+3);
+    test_ret("5+20-4", 5+20-4);
+    test_ret("12 + 34 - 5", 12+34-5);
+    test_ret("3 -  10+\t9", 3-10+9);
+    test_ret("5+6*7", 5+6*7);
+    test_ret("5*(9-6)", 5*(9-6));
+    test_ret("(3+5)/2", (3+5)/2);
 
     exit(0);
 }
