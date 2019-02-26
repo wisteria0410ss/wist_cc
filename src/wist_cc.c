@@ -48,7 +48,7 @@ void tokenize(char *p){
             p++;
             continue;
         }
-        if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')'){
+        if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')'){
             tokens[idx].type = *p;
             tokens[idx].str  = p;
             idx++;
@@ -113,6 +113,7 @@ Node *mul(){
     while(1){
         if(consume('*'))      node = node_new('*', node, term());
         else if(consume('/')) node = node_new('/', node, term());
+        else if(consume('%')) node = node_new('%', node, term());
         else return node;
     }
 }
@@ -158,7 +159,11 @@ void gen(Node *node){
         case '/':
             printf("\txor \trdx, rdx\n");
             printf("\tdiv \trdi\n");
-            break;    
+            break;   
+        case '%':
+            printf("\txor \trdx, rdx\n");
+            printf("\tdiv \trdi\n");
+            printf("\tmov \trax, rdx\n");
     }
     printf("\tpush\trax\n");
 
