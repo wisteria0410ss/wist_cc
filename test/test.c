@@ -37,6 +37,7 @@ void main(){
     test_ret("0", 0);
     test_ret("42", 42);
     test_ret("123", 123);
+    test_ret("1+3", 4);
 
     exit(0);
 }
