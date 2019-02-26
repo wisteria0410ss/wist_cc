@@ -38,6 +38,8 @@ void main(){
     test_ret("42", 42);
     test_ret("123", 123);
     test_ret("1+3", 4);
+    test_ret("5+20-4", 21);
+    test_ret("3-10+9", 2);
 
     exit(0);
 }

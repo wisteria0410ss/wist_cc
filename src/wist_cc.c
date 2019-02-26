@@ -22,6 +22,10 @@ int main(int argc, char **argv){
                 p++;
                 printf("    add      rax, %ld\n", strtol(p, &p, 10));
                 continue;
+            case '-':
+                p++;
+                printf("    sub      rax, %ld\n", strtol(p, &p, 10));
+                continue;
             default:
                 fprintf(stderr, "予期しない文字です: '%c'\n", *p);
                 return 1;
