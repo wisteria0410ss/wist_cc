@@ -1,12 +1,19 @@
 .PHONY: test clean
 
-bin/wist_cc: src/wist_cc.c src/wist_cc.h src/vector.c Makefile
-	gcc src/wist_cc.c src/vector.c -o bin/wist_cc
+HEADERS := $(wildcard src/*.h)
+OBJS    := $(patsubst src/%.c,obj/%.o,$(wildcard src/*.c))
+LOBJS   := $(filter-out obj/wist_cc.o,$(OBJS))
 
-bin/test: test/test.c src/vector.c Makefile
-	gcc test/test.c src/vector.c -o bin/test
+obj/%.o: src/%.c $(HEADERS) Makefile
+	gcc -c $< -o $@
 
-test: bin/test bin/wist_cc
+bin/wist_cc: $(OBJS) Makefile
+	gcc $(OBJS) -o $@
+
+bin/test: test/test.c $(LOBJS) Makefile
+	gcc $< $(LOBJS) -o $@
+
+test: bin/test bin/wist_cc Makefile
 	bin/test
 
 clean:
