@@ -24,3 +24,7 @@ void vector_push(Vector *vec, void *elem){
 Token *vector_get_token(Vector *vec, int pos){
     return (Token *)vec->data[pos];
 }
+
+Node *vector_get_node(Vector *vec, int pos){
+    return (Node *)vec->data[pos];
+}
