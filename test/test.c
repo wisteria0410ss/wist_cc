@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "../src/wist_cc.h"
 
 void compile(char *code);
 void test_ret(char *code, int expect);
+void test_num(char *msg, int result, int expect);
 
 void compile(char *code){
     int ret;
@@ -33,6 +35,17 @@ void test_ret(char *code, int expect){
     return;
 }
 
+void test_num(char *msg, int result, int expect){
+    if(result == expect){
+        printf("[\x1b[32mo\x1b[0m] %s\n\t=> %d\n", msg, result);
+    }else{
+        printf("[\x1b[31mx\x1b[0m] %s\n\t=> %d, expected %d\n", msg, result, expect);
+        exit(1);
+    }
+
+    return;
+}
+
 void main(){
     test_ret("0", 0);
     test_ret("42", 42);
@@ -46,6 +59,17 @@ void main(){
     test_ret("(3+5)/2", (3+5)/2);
     test_ret("(4+3)%5", (4+3)%5);
     test_ret("12-9%2", 12-9%2);
+    test_ret("1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1", 64);
+    
+
+    Vector *vec = vector_new();
+    test_num("[Vector, len]", vec->len, 0);
+
+    for(long i=0;i<100;i++) vector_push(vec, (void *)i);
+    test_num("[Vector, len]", vec->len, 100);
+    test_num("[Vector, item]", (long)vec->data[ 0],  0);
+    test_num("[Vector, item]", (long)vec->data[50], 50);
+    test_num("[Vector, item]", (long)vec->data[99], 99);
 
     exit(0);
 }

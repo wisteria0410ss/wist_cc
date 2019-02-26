@@ -2,64 +2,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-enum{
-    TOKEN_NUM = 256,    // 整数
-    TOKEN_EOF,          // EOF
-};
-
-typedef struct Token{
-    int   type;         // トークンの型
-    int   value;        // 整数型の場合、その値
-    char *str;          // トークン文字列
-} Token;
-
-enum{
-    NODE_NUM = 256,     // 整数
-};
-
-typedef struct Node{
-    int type;
-    struct Node *lhs;
-    struct Node *rhs;
-    int value;
-} Node;
-
-void tokenize(char *p);
-Node *node_new(int type, Node *lhs, Node *rhs);
-Node *node_new_num(int value);
-int consume(int type);
-Node *add();
-Node *mul();
-Node *term();
-void gen(Node *node);
-void error(int i);
+#include "wist_cc.h"
 
 // トークン列の保存先
-Token tokens[100];
+Vector *tokens;
 
 // 現在のトークン読み込み位置
 int pos = 0;
 
 void tokenize(char *p){
-    int idx = 0;        // 次に読むトークンの添字
     while(*p){
         if(isspace(*p)){
             p++;
             continue;
         }
         if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')'){
-            tokens[idx].type = *p;
-            tokens[idx].str  = p;
-            idx++;
+            Token *token = (Token *)malloc(sizeof(Token));
+            token->type = *p;
+            token->str  = p;
+            vector_push(tokens, token);
             p++;
             continue;
         }
         if(isdigit(*p)){
-            tokens[idx].type  = TOKEN_NUM;
-            tokens[idx].str   = p;
-            tokens[idx].value = strtol(p, &p, 10);
-            idx++;
+            Token *token = (Token *)malloc(sizeof(Token));
+            token->type  = TOKEN_NUM;
+            token->str   = p;
+            token->value = strtol(p, &p, 10);
+            vector_push(tokens, token);
             continue;
         }
 
@@ -67,9 +37,10 @@ void tokenize(char *p){
         exit(1);
     }
 
-    tokens[idx].type = TOKEN_EOF;
-    tokens[idx].str  = p;
-    idx++;
+    Token *token = (Token *)malloc(sizeof(Token));
+    token->type = TOKEN_EOF;
+    token->str  = p;
+    vector_push(tokens, token);
 
     return;
 }
@@ -92,7 +63,7 @@ Node *node_new_num(int value){
 }
 
 int consume(int type){
-    if(tokens[pos].type != type) return 0;
+    if(vector_get_token(tokens, pos)->type != type) return 0;
     pos++;
     return 1;
 }
@@ -122,16 +93,16 @@ Node *term(){
     if(consume('(')){
         Node *node = add();
         if(!consume(')')){
-            fprintf(stderr, "対応する閉括弧がありません: %s\n", tokens[pos].str);
+            fprintf(stderr, "対応する閉括弧がありません: %s\n", vector_get_token(tokens, pos)->str);
             exit(1);
         }
         return node;
     }
-    if(tokens[pos].type == TOKEN_NUM){
-        return node_new_num(tokens[pos++].value);
+    if(vector_get_token(tokens, pos)->type == TOKEN_NUM){
+        return node_new_num(vector_get_token(tokens, pos++)->value);
     }
 
-    fprintf(stderr, "不正なトークンです: %s\n", tokens[pos].str);
+    fprintf(stderr, "不正なトークンです: %s\n", vector_get_token(tokens, pos)->str);
     exit(1);
 }
 
@@ -171,7 +142,7 @@ void gen(Node *node){
 }
 
 void error(int i){
-    fprintf(stderr, "予期しないトークンです: %s\n", tokens[i].str);
+    fprintf(stderr, "予期しないトークンです: %s\n", vector_get_token(tokens, i)->str);
     exit(1);
 }
 
@@ -181,6 +152,7 @@ int main(int argc, char **argv){
         return 1;
     }
 
+    tokens = vector_new();
     tokenize(argv[1]);
     Node *node = add();
 
