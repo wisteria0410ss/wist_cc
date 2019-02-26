@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-//extern int main(int argc, char **argv);
 
 void compile(char *code);
 void test_ret(char *code, int expect);
@@ -25,9 +24,9 @@ void test_ret(char *code, int expect){
     ret = WEXITSTATUS(system("tmp/test"));
 
     if(ret == expect){
-        printf("[o] %s\n\t=> %d\n", code, ret);
+        printf("[\x1b[32mo\x1b[0m] %s\n\t=> %d\n", code, ret);
     }else{
-        printf("[x] %s\n\t=> %d, expected %d\n", code, ret, expect);
+        printf("[\x1b[31mx\x1b[0m] %s\n\t=> %d, expected %d\n", code, ret, expect);
         exit(1);
     }
 
