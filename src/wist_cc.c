@@ -12,6 +12,9 @@ Vector *code;
 // 現在のトークン読み込み位置
 int pos = 0;
 
+// ローカル変数のオフセットを記録する連想配列
+Map *local_val;
+
 void tokenize(char *p){
     while(*p){
         if(isspace(*p)){
@@ -19,11 +22,24 @@ void tokenize(char *p){
             continue;
         }
         if('a' <= *p && *p <= 'z'){
+            int cap = 16;
+            char *name = (char *)malloc(sizeof(char) * cap);
+            name[0] = '\0';
+            for(int len=1;'a'<=*p && *p<='z';p++,len++){
+                if(len >= cap){
+                    cap *= 2;
+                    name = realloc(name, cap);
+                }
+                sprintf(name, "%s%c", name, *p);
+            }
             Token *token = (Token *)malloc(sizeof(Token));
             token->type = TOKEN_ID;
-            token->str  = p;
+            token->str  = name;
             vector_push(tokens, token);
-            p++;
+            if(map_get(local_val, name)==NULL){
+                if(local_val->keys->len == 0) map_put(local_val, name, (void *)8);
+                else map_put(local_val, name, local_val->vals->data[local_val->keys->len-1]+8);
+            }
             continue;
         }
         if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '=' || *p == ';'){
@@ -71,7 +87,7 @@ Node *node_new_num(int value){
     return node;
 }
 
-Node *node_new_id(char name){
+Node *node_new_id(char *name){
     Node *node = (Node *)malloc(sizeof(Node));
     node->type = NODE_ID;
     node->name = name;
@@ -115,7 +131,7 @@ Node *term(){
         return node;
     }
     if(vector_get_token(tokens, pos)->type == TOKEN_ID){
-        return node_new_id(vector_get_token(tokens, pos++)->str[0]);
+        return node_new_id(vector_get_token(tokens, pos++)->str);
     }
     if(vector_get_token(tokens, pos)->type == TOKEN_NUM){
         return node_new_num(vector_get_token(tokens, pos++)->value);
@@ -154,7 +170,7 @@ void program(){
 void gen_lval(Node *node){
     if(node->type != NODE_ID) error("代入の左辺値が変数ではありません。", "");
 
-    int offset = ('z' - node->name + 1)*8;
+    int offset = (long)map_get(local_val, node->name);
     printf("\tmov \trax, rbp\n");
     printf("\tsub \trax, %d\n", offset);
     printf("\tpush\trax\n");
@@ -232,9 +248,11 @@ int main(int argc, char **argv){
 
     tokens = vector_new();
     code = vector_new();
-
+    local_val = map_new();
+    
     // トークナイズ, 結果はtokensに保存
     tokenize(argv[1]);
+
     // パース, 結果はcodeに保存
     program();
 
@@ -249,7 +267,7 @@ int main(int argc, char **argv){
     printf(
         "\tpush\trbp\n"
         "\tmov \trbp, rsp\n"
-        "\tsub \trsp, 208\n"
+        "\tsub \trsp, %d\n", 8*local_val->keys->len
     );
 
     for(int i=0;vector_get_node(code, i);i++){

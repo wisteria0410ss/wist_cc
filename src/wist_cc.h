@@ -20,7 +20,7 @@ typedef struct Node{
     struct Node *lhs;   // 左の子
     struct Node *rhs;   // 右の子
     int value;          // 整数型の場合、その値
-    char name;          // 識別子型の場合、その名前
+    char *name;          // 識別子型の場合、その名前
 } Node;
 
 typedef struct Vector{
@@ -49,7 +49,7 @@ void *map_get(Map *map, char *key);
 void tokenize(char *p);
 Node *node_new(int type, Node *lhs, Node *rhs);
 Node *node_new_num(int value);
-Node *node_new_id(char name);
+Node *node_new_id(char *name);
 int consume(int type);
 Node *add(void);
 Node *mul(void);

@@ -61,6 +61,12 @@ void main(){
     test_ret("12-9%2;", 12-9%2);
     test_ret("1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1;", 64);
     test_ret("a=3;b=5*6-8;a+b/2;", 14);
+    test_ret("hoge=3;fugafugafuga=5*6-8;hoge+fugafugafuga/2;", 14);
+    test_ret(
+        "a=1;b=2;c=3;d=1;e=1;f=2;g=3;h=1;i=1;j=2;k=3;l=1;m=1;n=2;o=3;p=1;q=20;"
+        "r=1;s=2;t=3;u=1;v=1;w=2;x=3;y=1;z=1;aa=2;ab=3;ac=1;ad=1;ae=2;af=3;ag=1;ah=20;"
+        "a=12;a+ah;", 32
+    );
 
     Vector *vec = vector_new();
     test_num("[Vector, len]", vec->len, 0);
