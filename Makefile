@@ -2,7 +2,7 @@
 
 HEADERS := $(wildcard src/*.h)
 OBJS    := $(patsubst src/%.c,obj/%.o,$(wildcard src/*.c))
-LOBJS   := $(filter-out obj/wist_cc.o,$(OBJS))
+LOBJS   := $(filter-out obj/main.o,$(OBJS))
 
 obj/%.o: src/%.c $(HEADERS) Makefile
 	gcc -c $< -o $@
