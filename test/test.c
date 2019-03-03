@@ -71,5 +71,14 @@ void main(){
     test_num("[Vector, item]", (long)vec->data[50], 50);
     test_num("[Vector, item]", (long)vec->data[99], 99);
 
+    Map *map = map_new();
+    test_num("[Map, NULL]", (long)map_get(map, "hoge"), 0);
+    map_put(map, "hoge", (void *)2);
+    test_num("[Map, item]", (long)map_get(map, "hoge"), 2);
+    map_put(map, "fuga", (void *)4);
+    test_num("[Map, item]", (long)map_get(map, "fuga"), 4);
+    map_put(map, "hoge", (void *)6);
+    test_num("[Map, item]", (long)map_get(map, "hoge"), 6);
+
     exit(0);
 }

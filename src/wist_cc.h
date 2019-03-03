@@ -29,11 +29,21 @@ typedef struct Vector{
     int len;
 } Vector;
 
+typedef struct Map{
+    Vector *keys;
+    Vector *vals;
+} Map;
+
 // vector.c
 Vector *vector_new(void);
 void vector_push(Vector *vec, void *elem);
 Token *vector_get_token(Vector *vec, int pos);
 Node *vector_get_node(Vector *vec, int pos);
+
+// map.c
+Map *map_new(void);
+void map_put(Map *map, char *key, void *val);
+void *map_get(Map *map, char *key);
 
 // wist_cc.c
 void tokenize(char *p);
