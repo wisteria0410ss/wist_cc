@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 #include "../src/wist_cc.h"
 
 void compile(char *code);
@@ -46,7 +47,7 @@ void test_num(char *msg, int result, int expect){
     return;
 }
 
-void main(){
+int main(){
     test_ret("0;", 0);
     test_ret("42;", 42);
     test_ret("123;", 123);
@@ -86,5 +87,5 @@ void main(){
     map_put(map, "hoge", (void *)6);
     test_num("[Map, item]", (long)map_get(map, "hoge"), 6);
 
-    exit(0);
+    return 0;
 }

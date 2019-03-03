@@ -127,6 +127,7 @@ Node *term(){
     }
 
     error("不正なトークンです: %s\n", vector_get_token(tokens, pos)->str);
+    return NULL;
 }
 
 Node *assign(){
