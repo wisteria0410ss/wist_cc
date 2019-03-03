@@ -12,7 +12,7 @@ obj/%.o: src/%.c $(HEADERS) Makefile
 bin/wist_cc: $(OBJS) Makefile
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
-bin/test: test/test.c $(LOBJS) Makefile
+bin/test: test/test.c $(HEADERS) $(LOBJS) Makefile
 	$(CC) $(CFLAGS) $< $(LOBJS) -o $@ $(LDFLAGS)
 
 test: bin/test bin/wist_cc Makefile
