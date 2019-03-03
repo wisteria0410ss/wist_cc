@@ -31,6 +31,14 @@ void tokenize(char *p){
             }
             continue;
         }
+        if((*p == '!' || *p == '=') && *(p+1) == '='){
+            Token *token = (Token *)malloc(sizeof(Token));
+            token->type = (*p=='='?TOKEN_EQ:TOKEN_NEQ);
+            token->str = p;
+            vector_push(tokens, token);
+            p += 2;
+            continue;
+        }
         if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '=' || *p == ';'){
             Token *token = (Token *)malloc(sizeof(Token));
             token->type = *p;
@@ -90,6 +98,16 @@ int consume(int type){
     return 1;
 }
 
+Node *cmp(){
+    Node *node = add();
+
+    while(1){
+        if(consume(TOKEN_EQ))       node = node_new(NODE_EQ,  node, add());
+        else if(consume(TOKEN_NEQ)) node = node_new(NODE_NEQ, node, add());
+        else return node;
+    }
+}
+
 Node *add(){
     Node *node = mul();
 
@@ -113,7 +131,7 @@ Node *mul(){
 
 Node *term(){
     if(consume('(')){
-        Node *node = add();
+        Node *node = cmp();
         if(!consume(')')){
             error("対応する閉括弧がありません: %s\n", vector_get_token(tokens, pos)->str);
         }
@@ -131,7 +149,7 @@ Node *term(){
 }
 
 Node *assign(){
-    Node *node = add();
+    Node *node = cmp();
 
     while(1){
         if(consume('=')) node = node_new('=', node, assign());

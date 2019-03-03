@@ -64,6 +64,17 @@ void gen(Node *node){
             printf("\txor \trdx, rdx\n");
             printf("\tdiv \trdi\n");
             printf("\tmov \trax, rdx\n");
+            break;
+        case NODE_EQ:
+            printf("\tcmp \trdi, rax\n");
+            printf("\tsete\tal\n");
+            printf("\tmovzb\trax, al\n");
+            break;
+        case NODE_NEQ:
+            printf("\tcmp \trdi, rax\n");
+            printf("\tsetne\tal\n");
+            printf("\tmovzb\trax, al\n");
+            break;
     }
     printf("\tpush\trax\n");
 

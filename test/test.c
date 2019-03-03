@@ -68,6 +68,9 @@ int main(){
         "r=1;s=2;t=3;u=1;v=1;w=2;x=3;y=1;z=1;aa=2;ab=3;ac=1;ad=1;ae=2;af=3;ag=1;ah=20;"
         "a=12;a+ah;", 32
     );
+    test_ret("a=4;b=2;a==b;", 0);
+    test_ret("a=4;b=2;a!=b;", 1);
+    test_ret("((2==3+1)-1!=3-4)*12;", 0);
 
     Vector *vec = vector_new();
     test_num("[Vector, len]", vec->len, 0);

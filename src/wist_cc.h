@@ -1,6 +1,8 @@
 enum{
     TOKEN_NUM = 256,    // 整数
     TOKEN_ID,           // 識別子
+    TOKEN_EQ,           // 比較演算子==
+    TOKEN_NEQ,          // 比較演算子!=
     TOKEN_EOF,          // EOF
 };
 
@@ -13,6 +15,8 @@ typedef struct Token{
 enum{
     NODE_NUM = 256,     // 整数
     NODE_ID,
+    NODE_EQ,
+    NODE_NEQ,
 };
 
 typedef struct Node{
@@ -51,6 +55,7 @@ Node *node_new(int type, Node *lhs, Node *rhs);
 Node *node_new_num(int value);
 Node *node_new_id(char *name);
 int consume(int type);
+Node *cmp(void);
 Node *add(void);
 Node *mul(void);
 Node *term(void);
