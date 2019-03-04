@@ -9,13 +9,16 @@ LOBJS   := $(filter-out obj/main.o,$(OBJS))
 obj/%.o: src/%.c $(HEADERS) Makefile
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
+obj/func.o: test/func.c Makefile
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
+
 bin/wist_cc: $(OBJS) Makefile
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
 bin/test: test/test.c $(HEADERS) $(LOBJS) Makefile
 	$(CC) $(CFLAGS) $< $(LOBJS) -o $@ $(LDFLAGS)
 
-test: bin/test bin/wist_cc Makefile
+test: bin/test bin/wist_cc obj/func.o Makefile
 	bin/test
 
 clean:

@@ -17,7 +17,7 @@ void compile(char *code){
         fprintf(stderr, "compile error: %d\ntest aborted.\n", ret);
         exit(1);
     }
-    system("gcc tmp/test.s -o tmp/test");
+    system("gcc tmp/test.s obj/func.o -o tmp/test");
 }
 
 void test_ret(char *code, int expect){
@@ -71,6 +71,7 @@ int main(){
     test_ret("a=4;b=2;a==b;", 0);
     test_ret("a=4;b=2;a!=b;", 1);
     test_ret("((2==3+1)-1!=3-4)*12;", 0);
+    test_ret("1+foo()*3;", 4);
 
     Vector *vec = vector_new();
     test_num("[Vector, len]", vec->len, 0);

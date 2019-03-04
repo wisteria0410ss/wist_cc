@@ -15,6 +15,7 @@ typedef struct Token{
 enum{
     NODE_NUM = 256,     // 整数
     NODE_ID,
+    NODE_FUNC,
     NODE_EQ,
     NODE_NEQ,
 };
@@ -54,6 +55,7 @@ void tokenize(char *p);
 Node *node_new(int type, Node *lhs, Node *rhs);
 Node *node_new_num(int value);
 Node *node_new_id(char *name);
+Node *node_new_func(char *name);
 int consume(int type);
 Node *cmp(void);
 Node *add(void);

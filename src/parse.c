@@ -10,11 +10,11 @@ void tokenize(char *p){
             p++;
             continue;
         }
-        if('a' <= *p && *p <= 'z'){
+        if(('a' <= *p && *p <= 'z') || ('A' <= *p && *p <= 'Z')){
             int cap = 16;
             char *name = (char *)malloc(sizeof(char) * cap);
             name[0] = '\0';
-            for(int len=1;'a'<=*p && *p<='z';p++,len++){
+            for(int len=1;('a' <= *p && *p <= 'z') || ('A' <= *p && *p <= 'Z');p++,len++){
                 if(len >= cap){
                     cap *= 2;
                     name = realloc(name, cap);
@@ -92,6 +92,14 @@ Node *node_new_id(char *name){
     return node;
 }
 
+Node *node_new_func(char *name){
+    Node *node = (Node *)malloc(sizeof(Node));
+    node->type = NODE_FUNC;
+    node->name = name;
+
+    return node;
+}
+
 int consume(int type){
     if(vector_get_token(tokens, pos)->type != type) return 0;
     pos++;
@@ -138,7 +146,13 @@ Node *term(){
         return node;
     }
     if(vector_get_token(tokens, pos)->type == TOKEN_ID){
-        return node_new_id(vector_get_token(tokens, pos++)->str);
+        pos++;
+        if(consume('(')){
+            if(!consume(')')){
+                error("対応する閉括弧がありません: %s\n", vector_get_token(tokens, pos)->str);
+            }
+            return node_new_func(vector_get_token(tokens, pos-3)->str);
+        }else return node_new_id(vector_get_token(tokens, pos-1)->str);
     }
     if(vector_get_token(tokens, pos)->type == TOKEN_NUM){
         return node_new_num(vector_get_token(tokens, pos++)->value);

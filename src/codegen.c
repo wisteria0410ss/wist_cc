@@ -28,6 +28,12 @@ void gen(Node *node){
         return;
     }
 
+    if(node->type == NODE_FUNC){
+        printf("\tcall\t%s\n", node->name);
+        printf("\tpush\trax\n");
+        return;
+    }
+
     if(node->type == '='){
         gen_lval(node->lhs);
         gen(node->rhs);
