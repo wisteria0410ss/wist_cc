@@ -3,6 +3,8 @@
 #include <sys/wait.h>
 #include "../src/wist_cc.h"
 
+extern int sum_10(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
+
 void compile(char *code);
 void test_ret(char *code, int expect);
 void test_num(char *msg, int result, int expect);
@@ -70,8 +72,12 @@ int main(){
     );
     test_ret("a=4;b=2;a==b;", 0);
     test_ret("a=4;b=2;a!=b;", 1);
+    test_ret("3==1==1;", (3==1)==1);
+    test_ret("3!=1==1;", (3!=1)==1);
     test_ret("((2==3+1)-1!=3-4)*12;", 0);
     test_ret("1+foo()*3;", 4);
+    test_ret("2*bar(2, 3, 5)+8;", 22);
+    test_ret("a=sum_10(1,2,3,4,5,6,7,8,9,10,112);a%256;", sum_10(1,2,3,4,5,6,7,8,9,10)%256);
 
     Vector *vec = vector_new();
     test_num("[Vector, len]", vec->len, 0);

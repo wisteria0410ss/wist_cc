@@ -29,8 +29,32 @@ void gen(Node *node){
     }
 
     if(node->type == NODE_FUNC){
-        printf("\tcall\t%s\n", node->name);
-        printf("\tpush\trax\n");
+        if(node->lhs == NULL){
+            printf("\tcall\t%s\n", node->name);
+            printf("\tpush\trax\n");
+        }else{
+            int cnt = 1, rest;
+            Node *ar;
+            for(ar=node->lhs;ar->type==',';ar=ar->lhs) cnt++;
+            rest = cnt;
+
+            char reg[6][4] = {"rdi", "rsi", "rdx", "rcx", "r8 ", "r9 "};
+            if(cnt>6 && cnt%2==1) printf("\tsub \trsp, 8\n");
+            for(ar=node->lhs;ar->type==',';ar=ar->lhs){
+                gen(ar->rhs);
+                rest--;
+                if(rest<6) printf("\tpop \t%s\n", reg[rest]);
+            }
+            gen(ar);
+            rest--;
+            printf("\tpop \t%s\n", reg[rest]);
+            if(rest != 0) error("引数の処理に失敗しました。", "");
+
+            printf("\tcall\t%s\n", node->name);
+            if(cnt>6) printf("\tadd \trsp, %d\n", (cnt-5)/2*16);
+            printf("\tpush\trax\n");
+        }
+        
         return;
     }
 
