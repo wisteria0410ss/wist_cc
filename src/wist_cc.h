@@ -3,6 +3,7 @@ enum{
     TOKEN_ID,           // 識別子
     TOKEN_EQ,           // 比較演算子==
     TOKEN_NEQ,          // 比較演算子!=
+    TOKEN_RET,          // キーワード return
     TOKEN_EOF,          // EOF
 };
 
@@ -18,6 +19,7 @@ enum{
     NODE_FUNC,
     NODE_EQ,
     NODE_NEQ,
+    NODE_RET,
 };
 
 typedef struct Node{

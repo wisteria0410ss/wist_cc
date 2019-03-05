@@ -19,19 +19,21 @@ void compile(char *code){
         fprintf(stderr, "compile error: %d\ntest aborted.\n", ret);
         exit(1);
     }
-    system("gcc tmp/test.s obj/func.o -o tmp/test");
+    system("gcc -no-pie tmp/test.s obj/func.o -o tmp/test");
 }
 
 void test_ret(char *code, int expect){
+    printf("[\x1b[36mR\x1b[0m] %s\n", code);
+    
     compile(code);
 
     int ret;
     ret = WEXITSTATUS(system("tmp/test"));
 
     if(ret == expect){
-        printf("[\x1b[32mo\x1b[0m] %s\n\t=> %d\n", code, ret);
+        printf("[\x1b[32mo\x1b[0m] %d\n\n", ret);
     }else{
-        printf("[\x1b[31mx\x1b[0m] %s\n\t=> %d, expected %d\n", code, ret, expect);
+        printf("[\x1b[31mx\x1b[0m] %d, expected %d\n\n", ret, expect);
         exit(1);
     }
 
@@ -39,10 +41,11 @@ void test_ret(char *code, int expect){
 }
 
 void test_num(char *msg, int result, int expect){
+    printf("[\x1b[36mN\x1b[0m] %s\n", msg);
     if(result == expect){
-        printf("[\x1b[32mo\x1b[0m] %s\n\t=> %d\n", msg, result);
+        printf("[\x1b[32mo\x1b[0m] %d\n\n", result);
     }else{
-        printf("[\x1b[31mx\x1b[0m] %s\n\t=> %d, expected %d\n", msg, result, expect);
+        printf("[\x1b[31mx\x1b[0m] %d, expected %d\n\n", result, expect);
         exit(1);
     }
 
@@ -78,6 +81,8 @@ int main(){
     test_ret("1+foo()*3;", 4);
     test_ret("2*bar(2, 3, 5)+8;", 22);
     test_ret("a=sum_10(1,2,3,4,5,6,7,8,9,10,112);a%256;", sum_10(1,2,3,4,5,6,7,8,9,10)%256);
+    test_ret("putchar(72);putchar(101);putchar(108);putchar(108);putchar(111);putchar(10);", 10);
+    test_ret("putchar(72);putchar(101);putchar(108);return putchar(108);putchar(111);putchar(10);", 108);
 
     Vector *vec = vector_new();
     test_num("[Vector, len]", vec->len, 0);

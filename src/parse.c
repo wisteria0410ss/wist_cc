@@ -22,12 +22,17 @@ void tokenize(char *p){
                 sprintf(name, "%s%c", name, *p);
             }
             Token *token = (Token *)malloc(sizeof(Token));
-            token->type = TOKEN_ID;
             token->str  = name;
-            vector_push(tokens, token);
-            if(map_get(local_val, name)==NULL){
-                if(local_val->keys->len == 0) map_put(local_val, name, (void *)8);
-                else map_put(local_val, name, local_val->vals->data[local_val->keys->len-1]+8);
+            if(strcmp(name, "return") == 0){
+                token->type = TOKEN_RET;
+                vector_push(tokens, token);
+            }else{
+                token->type = TOKEN_ID;
+                vector_push(tokens, token);
+                if(map_get(local_val, name)==NULL){
+                    if(local_val->keys->len == 0) map_put(local_val, name, (void *)8);
+                    else map_put(local_val, name, local_val->vals->data[local_val->keys->len-1]+8);
+                }
             }
             continue;
         }
@@ -184,7 +189,9 @@ Node *assign(){
 }
 
 Node *stmt(){
-    Node *node = assign();
+    Node *node;
+    if(consume(TOKEN_RET)) node = node_new(NODE_RET, assign(), NULL);
+    else node = assign();
     if(!consume(';')){
         error(";が必要です: %s\n", vector_get_token(tokens, pos)->str);
     }

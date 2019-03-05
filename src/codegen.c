@@ -13,6 +13,17 @@ void gen_lval(Node *node){
 }
 
 void gen(Node *node){
+    if(node->type == NODE_RET){
+        gen(node->lhs);
+        printf(
+            "\tpop \trax\n"
+            "\tmov \trsp, rbp\n"
+            "\tpop \trbp\n"
+            "\tret\n"
+        );
+        return;
+    }
+
     if(node->type == NODE_NUM){
         printf("\tpush\t%d\n", node->value);
         return;
