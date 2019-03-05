@@ -11,7 +11,7 @@ void test_num(char *msg, int result, int expect);
 
 void compile(char *code){
     int ret;
-    char cmdline[256];
+    char cmdline[2048];
 
     sprintf(cmdline, "bin/wist_cc \'%s\' > tmp/test.s", code);
     ret = WEXITSTATUS(system(cmdline));
@@ -53,36 +53,60 @@ void test_num(char *msg, int result, int expect){
 }
 
 int main(){
-    test_ret("0;", 0);
-    test_ret("42;", 42);
-    test_ret("123;", 123);
-    test_ret("1+3;", 1+3);
-    test_ret("5+20-4;", 5+20-4);
-    test_ret("12 + 34 - 5;", 12+34-5);
-    test_ret("3 -  10+\t9;", 3-10+9);
-    test_ret("5+6*7;", 5+6*7);
-    test_ret("5*(9-6);", 5*(9-6));
-    test_ret("(3+5)/2;", (3+5)/2);
-    test_ret("(4+3)%5;", (4+3)%5);
-    test_ret("12-9%2;", 12-9%2);
-    test_ret("1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1;", 64);
-    test_ret("a=3;b=5*6-8;a+b/2;", 14);
-    test_ret("hoge=3;fugafugafuga=5*6-8;hoge+fugafugafuga/2;", 14);
+    test_ret("main(){0;}", 0);
+    test_ret("main(){42;}", 42);
+    test_ret("main(){1+3;}", 1+3);
+    test_ret("main(){5+20-4;}", 5+20-4);
+    test_ret("main(){12 + 34 - 5;}", 12+34-5);
+    test_ret("main(){3 -  10+\t9;}", 3-10+9);
+    test_ret("main(){5+6*7;}", 5+6*7);
+    test_ret("main(){5*(9-6);}", 5*(9-6));
+    test_ret("main(){(3+5)/2;}", (3+5)/2);
+    test_ret("main(){(4+3)%5;}", (4+3)%5);
+    test_ret("main(){12-9%2;}", 12-9%2);
+    test_ret("main(){1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1;}", 64);
+    test_ret("main(){a=3;b=5*6-8;a+b/2;}", 14);
+    test_ret("main(){hoge=3;fugafugafuga=5*6-8;hoge+fugafugafuga/2;}", 14);
     test_ret(
-        "a=1;b=2;c=3;d=1;e=1;f=2;g=3;h=1;i=1;j=2;k=3;l=1;m=1;n=2;o=3;p=1;q=20;"
-        "r=1;s=2;t=3;u=1;v=1;w=2;x=3;y=1;z=1;aa=2;ab=3;ac=1;ad=1;ae=2;af=3;ag=1;ah=20;"
-        "a=12;a+ah;", 32
+        "main(){\n"
+        "\ta=1;b=2;c=3;d=1;e=1;f=2;g=3;h=1;i=1;j=2;k=3;l=1;m=1;n=2;o=3;p=1;q=20;\n"
+        "\tr=1;s=2;t=3;u=1;v=1;w=2;x=3;y=1;z=1;aa=2;ab=3;ac=1;ad=1;ae=2;af=3;ag=1;ah=20;\n"
+        "\ta=12;a+ah;\n"
+        "}\n", 32
     );
-    test_ret("a=4;b=2;a==b;", 0);
-    test_ret("a=4;b=2;a!=b;", 1);
-    test_ret("3==1==1;", (3==1)==1);
-    test_ret("3!=1==1;", (3!=1)==1);
-    test_ret("((2==3+1)-1!=3-4)*12;", 0);
-    test_ret("1+foo()*3;", 4);
-    test_ret("2*bar(2, 3, 5)+8;", 22);
-    test_ret("a=sum_10(1,2,3,4,5,6,7,8,9,10,112);a%256;", sum_10(1,2,3,4,5,6,7,8,9,10)%256);
-    test_ret("putchar(72);putchar(101);putchar(108);putchar(108);putchar(111);putchar(10);", 10);
-    test_ret("putchar(72);putchar(101);putchar(108);return putchar(108);putchar(111);putchar(10);", 108);
+    test_ret("main(){a=4;b=2;a==b;}", 0);
+    test_ret("main(){a=4;b=2;a!=b;}", 1);
+    test_ret("main(){3==1==1;}", (3==1)==1);
+    test_ret("main(){3!=1==1;}", (3!=1)==1);
+    test_ret("main(){((2==3+1)-1!=3-4)*12;}", 0);
+    test_ret("main(){1+foo()*3;}", 4);
+    test_ret("main(){2*bar(2, 3, 5)+8;}", 22);
+    test_ret("main(){a=sum_10(1,2,3,4,5,6,7,8,9,10,112);a%256;}", sum_10(1,2,3,4,5,6,7,8,9,10)%256);
+    test_ret("main(){putchar(72);putchar(101);putchar(108);putchar(108);putchar(111);putchar(10);}", 10);
+    test_ret("main(){putchar(72);putchar(101);putchar(108);return putchar(108);putchar(111);putchar(10);}", 108);
+    test_ret("main(){return 42;}", 42);
+    test_ret("one(){return 1;}\nmain(){a=one();return a*2+3;}", 5);
+    test_ret("db(x){return x*2;}main(){return db(4);}", 8);
+    test_ret("sum2(x,y){return x+y;}sum3(x,y,z){return x+y+z;}main(){sum2(1,2)+sum3(3,4+2,5);}", 1+2+3+6+5);
+    test_ret(
+        "main(){\n"
+        "    ret = sum10(1,2,3,4,5,6,7,8,9,10);\n"
+        "    return ret % 256;\n"
+        "}\n"
+        "sum10(a0,a1,a2,a3,a4,a5,a6,a7,a8,a9){\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        "    putchar(48+a9-1);\n"
+        
+        "    return 0*a0 + 1*a1 + 2*a2 + 3*a3 + 4*a4 + 5*a5 + 6*a6 + 7*a7 + 8*a8 + 9*a9;\n"
+        "}\n", sum_10(1,2,3,4,5,6,7,8,9,10)%256);
 
     Vector *vec = vector_new();
     test_num("[Vector, len]", vec->len, 0);

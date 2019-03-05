@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "wist_cc.h"
 
-void gen_lval(Node *node){
+void gen_lval(Node *node, int func_id){
     if(node->type != NODE_ID) error("代入の左辺値が変数ではありません。", "");
 
-    int offset = (long)map_get(local_val, node->name);
+    int offset = (long)map_get(local_val->data[func_id], node->name);
     printf("\tmov \trax, rbp\n");
     printf("\tsub \trax, %d\n", offset);
     printf("\tpush\trax\n");
@@ -12,9 +12,9 @@ void gen_lval(Node *node){
     return;
 }
 
-void gen(Node *node){
+void gen(Node *node, int func_id){
     if(node->type == NODE_RET){
-        gen(node->lhs);
+        gen(node->lhs, func_id);
         printf(
             "\tpop \trax\n"
             "\tmov \trsp, rbp\n"
@@ -30,7 +30,7 @@ void gen(Node *node){
     }
 
     if(node->type == NODE_ID){
-        gen_lval(node);
+        gen_lval(node, func_id);
         printf(
             "\tpop \trax\n"
             "\tmov \trax, [rax]\n"
@@ -39,7 +39,7 @@ void gen(Node *node){
         return;
     }
 
-    if(node->type == NODE_FUNC){
+    if(node->type == NODE_FNC){
         if(node->lhs == NULL){
             printf("\tcall\t%s\n", node->name);
             printf("\tpush\trax\n");
@@ -52,11 +52,11 @@ void gen(Node *node){
             char reg[6][4] = {"rdi", "rsi", "rdx", "rcx", "r8 ", "r9 "};
             if(cnt>6 && cnt%2==1) printf("\tsub \trsp, 8\n");
             for(ar=node->lhs;ar->type==',';ar=ar->lhs){
-                gen(ar->rhs);
+                gen(ar->rhs, func_id);
                 rest--;
                 if(rest<6) printf("\tpop \t%s\n", reg[rest]);
             }
-            gen(ar);
+            gen(ar, func_id);
             rest--;
             printf("\tpop \t%s\n", reg[rest]);
             if(rest != 0) error("引数の処理に失敗しました。", "");
@@ -70,8 +70,8 @@ void gen(Node *node){
     }
 
     if(node->type == '='){
-        gen_lval(node->lhs);
-        gen(node->rhs);
+        gen_lval(node->lhs, func_id);
+        gen(node->rhs, func_id);
 
         printf(
             "\tpop \trdi\n"
@@ -82,8 +82,8 @@ void gen(Node *node){
         return;
     }
 
-    gen(node->lhs);
-    gen(node->rhs);
+    gen(node->lhs, func_id);
+    gen(node->rhs, func_id);
     printf("\tpop \trdi\n");
     printf("\tpop \trax\n");
     

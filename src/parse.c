@@ -5,6 +5,7 @@
 #include "wist_cc.h"
 
 void tokenize(char *p){
+    int blocklevel = 0;
     while(*p){
         if(isspace(*p)){
             p++;
@@ -29,9 +30,19 @@ void tokenize(char *p){
             }else{
                 token->type = TOKEN_ID;
                 vector_push(tokens, token);
-                if(map_get(local_val, name)==NULL){
-                    if(local_val->keys->len == 0) map_put(local_val, name, (void *)8);
-                    else map_put(local_val, name, local_val->vals->data[local_val->keys->len-1]+8);
+
+                for(;isspace(*p);p++) ;
+                if(*p == '('){
+                    if(blocklevel == 0){
+                        blocklevel++;
+                        vector_push(local_val, map_new());
+                    }
+                    continue;
+                }
+                Map *lval = (Map *)local_val->data[local_val->len-1];
+                if(blocklevel > 0 && map_get(lval, name)==NULL){
+                    if(lval->keys->len == 0) map_put(lval, name, (void *)8);
+                    else map_put(lval, name, lval->vals->data[lval->keys->len-1]+8);
                 }
             }
             continue;
@@ -44,7 +55,9 @@ void tokenize(char *p){
             p += 2;
             continue;
         }
-        if(strchr("+-*/%()=;,", *p) != NULL){
+        if(strchr("+-*/%(){}=;,", *p) != NULL){
+            if(*p == '{'){}
+            if(*p == '}') blocklevel--;
             Token *token = (Token *)malloc(sizeof(Token));
             token->type = *p;
             token->str  = p;
@@ -97,9 +110,18 @@ Node *node_new_id(char *name){
     return node;
 }
 
-Node *node_new_func(char *name, Node *args){
+Node *node_new_fnc(char *name, Node *args){
     Node *node = (Node *)malloc(sizeof(Node));
-    node->type = NODE_FUNC;
+    node->type = NODE_FNC;
+    node->name = name;
+    node->lhs  = args;
+
+    return node;
+}
+
+Node *node_new_fnd(char *name, Node *args){
+    Node *node = (Node *)malloc(sizeof(Node));
+    node->type = NODE_FND;
     node->name = name;
     node->lhs  = args;
 
@@ -163,12 +185,12 @@ Node *term(){
         int pos_open = pos;
         pos++;
         if(consume('(')){
-            if(consume(')')) return node_new_func(vector_get_token(tokens, pos_open)->str, NULL);
+            if(consume(')')) return node_new_fnc(vector_get_token(tokens, pos_open)->str, NULL);
             Node *node = cmm();
             if(!consume(')')){
                 error("対応する閉括弧がありません: %s\n", vector_get_token(tokens, pos)->str);
             }
-            return node_new_func(vector_get_token(tokens, pos_open)->str, node);
+            return node_new_fnc(vector_get_token(tokens, pos_open)->str, node);
         }else return node_new_id(vector_get_token(tokens, pos-1)->str);
     }
     if(vector_get_token(tokens, pos)->type == TOKEN_NUM){
@@ -201,7 +223,21 @@ Node *stmt(){
 
 void program(){
     while(vector_get_token(tokens, pos)->type != TOKEN_EOF){
-        vector_push(code, stmt());
+        if(vector_get_token(tokens, pos)->type == TOKEN_ID && vector_get_token(tokens, pos+1)->type == '('){
+            char *name = vector_get_token(tokens, pos)->str;
+            pos += 2;
+            if(vector_get_token(tokens, pos)->type == ')')
+                vector_push(code, node_new_fnd(name, NULL));
+            else
+                vector_push(code, node_new_fnd(name, cmm()));
+            if(!consume(')')) error("対応する閉括弧がありません: %s\n", vector_get_token(tokens, pos)->str);
+            if(!consume('{')) error("{が必要です: %s\n", vector_get_token(tokens, pos)->str);
+            
+            while(!consume('}')){
+                vector_push(code, stmt());
+                if(vector_get_token(tokens, pos)->type == TOKEN_EOF) error("対応する}がありません", "");
+            }
+        }else error("関数定義ではありません: %s\n", vector_get_token(tokens, pos)->str);
     }
     vector_push(code, NULL);
 

@@ -8,8 +8,8 @@ Vector *tokens;
 Vector *code;
 // 現在のトークン読み込み位置
 int pos;
-// ローカル変数のオフセットを記録する連想配列
-Map *local_val;
+// ローカル変数のオフセットを記録する連想配列のVector
+Vector *local_val;
 
 void error(char *msg, char *str){
     fprintf(stderr, msg, str);
@@ -19,6 +19,6 @@ void error(char *msg, char *str){
 void global_init(){
     tokens = vector_new();
     code = vector_new();
-    local_val = map_new();
+    local_val = vector_new();
     pos = 0;
 }
