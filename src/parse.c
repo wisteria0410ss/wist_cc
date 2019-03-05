@@ -44,7 +44,7 @@ void tokenize(char *p){
             p += 2;
             continue;
         }
-        if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '=' || *p == ';' || *p == ','){
+        if(strchr("+-*/%()=;,", *p) != NULL){
             Token *token = (Token *)malloc(sizeof(Token));
             token->type = *p;
             token->str  = p;
